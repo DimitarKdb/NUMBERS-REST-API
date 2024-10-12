@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class ClientNIO {
@@ -12,7 +13,7 @@ public class ClientNIO {
     private static final String SERVER_HOST = "localhost";
     private static final int BUFFER_SIZE = 512;
     private static final String STANDARD_CHARSET = "UTF-8";
-    private static ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+    private static ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
     public static void main(String[] args) {
 
@@ -42,7 +43,9 @@ public class ClientNIO {
                 socketChannel.read(buffer);
                 buffer.flip();
 
-                String reply = new String(buffer.array(), 0, buffer.position(), STANDARD_CHARSET);
+                byte[] byteArray = new byte[buffer.remaining()];
+                buffer.get(byteArray);
+                String reply = new String(byteArray, STANDARD_CHARSET);
 
                 System.out.println(reply);
             }
@@ -52,4 +55,5 @@ public class ClientNIO {
         }
 
     }
+
 }
