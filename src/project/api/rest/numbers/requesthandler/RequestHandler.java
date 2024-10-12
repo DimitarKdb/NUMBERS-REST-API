@@ -1,7 +1,7 @@
 package project.api.rest.numbers.requesthandler;
 
 import com.google.gson.Gson;
-import project.api.rest.numbers.httpresponse.HTTPResponse;
+import project.api.rest.numbers.factdata.FactData;
 import project.api.rest.numbers.result.Result;
 import project.api.rest.numbers.status.Status;
 import project.api.rest.numbers.type.facts.FactType;
@@ -40,10 +40,10 @@ public class RequestHandler {
 
         Gson gson = new Gson();
 
-        HTTPResponse response;
+        FactData response;
 
         try {
-            response = gson.fromJson(future.get(), HTTPResponse.class);
+            response = gson.fromJson(future.get(), FactData.class);
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Problem with the HTTP request. No response is given.", e);
         }
