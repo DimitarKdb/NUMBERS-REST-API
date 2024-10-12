@@ -1,18 +1,13 @@
 package project.api.rest.numbers.server;
 
-import com.google.gson.Gson;
 import project.api.rest.numbers.commands.Command;
-import project.api.rest.numbers.httpresponse.HTTPResponse;
+import project.api.rest.numbers.requesthandler.RequestHandler;
 import project.api.rest.numbers.result.Result;
 import project.api.rest.numbers.status.Status;
 import project.api.rest.numbers.type.facts.FactType;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -20,8 +15,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+
 
 public class ServerNIO {
 
@@ -34,6 +28,8 @@ public class ServerNIO {
     private static final int MATH_PARAMETERS = 1;
     private static final int YEAR_PARAMETERS = 1;
     private static final int DATE_PARAMETERS = 2;
+
+    private static final RequestHandler client = RequestHandler.getInstance();
 
     public static void main(String[] args) {
 
@@ -147,7 +143,7 @@ public class ServerNIO {
             return new Result(null, Status.WRONG_PARAMETERS, FactType.TRIVIA);
         }
 
-        return apiResponse(parameters, FactType.TRIVIA);
+        return client.apiResponse(parameters, FactType.TRIVIA);
     }
 
 
@@ -156,7 +152,7 @@ public class ServerNIO {
             return new Result(null, Status.WRONG_PARAMETERS, FactType.MATH);
         }
 
-        return apiResponse(parameters, FactType.MATH);
+        return client.apiResponse(parameters, FactType.MATH);
     }
 
     private static Result getYearFact(String[] parameters) {
@@ -164,7 +160,7 @@ public class ServerNIO {
             return new Result(null, Status.WRONG_PARAMETERS, FactType.YEAR);
         }
 
-        return apiResponse(parameters, FactType.YEAR);
+        return client.apiResponse(parameters, FactType.YEAR);
     }
 
     private static Result getDateFact(String[] parameters) {
@@ -172,7 +168,7 @@ public class ServerNIO {
             return new Result(null, Status.WRONG_PARAMETERS, FactType.DATE);
         }
 
-        return apiResponse(parameters, FactType.DATE);
+        return client.apiResponse(parameters, FactType.DATE);
     }
 
     private static Result getRandomFact(String[] parameters) {
@@ -189,40 +185,7 @@ public class ServerNIO {
             default -> FactType.TRIVIA;
         };
 
-        return apiResponse(new String[] {"random"}, type);
+        return client.apiResponse(new String[] {"random"}, type);
     }
 
-    private static Result apiResponse(String[] parameters, FactType type) {
-
-        URI uri;
-
-        if (type == FactType.DATE && !parameters[0].equals("random")) {
-            uri = URI.create("http://numbersapi.com/" + parameters[1] + "/" + parameters[0] + "/" + type.getType() + "?json");
-        } else {
-            uri = URI.create("http://numbersapi.com/" + parameters[0] + "/" + type.getType() + "?json");
-        }
-
-
-        HttpClient client = HttpClient.newBuilder().build();
-
-        HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
-
-        CompletableFuture<String> future = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body);
-
-        Gson gson = new Gson();
-
-        HTTPResponse response;
-
-        try {
-            response = gson.fromJson(future.get(), HTTPResponse.class);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Problem with the HTTP request. No response is given.", e);
-        }
-
-        if (response.isFound()) {
-            return new Result(response.getText(), Status.GOOD, type);
-        } else {
-            return new Result(null, Status.NOT_FOUND, type);
-        }
-    }
 }
