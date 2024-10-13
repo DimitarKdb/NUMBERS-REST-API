@@ -6,13 +6,13 @@ This project is a Java-based NIO (Non-blocking I/O) client-server application th
 
 The application supports six commands that clients can use:
 
-1. **get-math-fact <number>**  
+1. **get-math-fact `<number>`**  
    Retrieves a random math fact about the specified number.
-2. **get-trivia-fact <number>**  
+2. **get-trivia-fact `<number>`**  
    Retrieves a random trivia fact about the specified number.
-3. **get-date-fact <day> <month>**  
+3. **get-date-fact `<day>` `<month>`**  
    Retrieves a random fact about the specified day and month (e.g., a notable event on that day).
-4. **get-year-fact <year>**  
+4. **get-year-fact `<year>`**  
    Retrieves a random fact about the specified year.
 5. **get-random-fact**  
    Returns a random fact from one of the above categories (math, trivia, date, year).
