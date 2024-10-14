@@ -38,4 +38,6 @@ public class Command {
     public String[] getParameters() {
         return this.parameters;
     }
+
+
 }
