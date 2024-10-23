@@ -27,11 +27,14 @@ public class RequestHandler {
     public Result apiResponse(String[] parameters, FactType type) {
 
         URI uri;
+        String parameter;
 
         if (type == FactType.DATE && !parameters[0].equals("random")) {
-            uri = URI.create("http://numbersapi.com/" + parameters[1] + "/" + parameters[0] + "/" + type.getType() + "?json");
+            parameter = parameters[1] + "/" + parameters[0];
+            uri = URI.create("http://numbersapi.com/" + parameter + "/" + type.getType() + "?json");
         } else {
-            uri = URI.create("http://numbersapi.com/" + parameters[0] + "/" + type.getType() + "?json");
+            parameter = parameters[0];
+            uri = URI.create("http://numbersapi.com/" + parameter + "/" + type.getType() + "?json");
         }
 
         HttpRequest request = HttpRequest.newBuilder().uri(uri).build();

@@ -2,6 +2,7 @@ package project.api.rest.numbers.server;
 
 import project.api.rest.numbers.commands.Command;
 import project.api.rest.numbers.commands.CommandExecutor;
+import project.api.rest.numbers.fact.cache.FactCacheSystem;
 import project.api.rest.numbers.result.Result;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -25,6 +27,9 @@ public class ServerNIO {
 
     private static boolean hasClients;
     private static int clientCount;
+
+    private static final FactCacheSystem factCacheSystem = new FactCacheSystem();
+    private static final String CACHED_FACTS_FILE = "cached_facts.txt";
 
 
     public static void main(String[] args) {
@@ -44,6 +49,9 @@ public class ServerNIO {
 
             clientCount = 0;
             hasClients = true;
+
+            factCacheSystem.loadData(Path.of(CACHED_FACTS_FILE));
+            CommandExecutor.setCacheSystem(factCacheSystem);
 
             System.out.println("Server has been set up!");
 
@@ -84,6 +92,8 @@ public class ServerNIO {
         } catch (IOException e) {
             throw new RuntimeException("An error occurred while handling clients requests!", e);
         }
+
+        factCacheSystem.saveData(Path.of(CACHED_FACTS_FILE));
 
         System.out.println("No more clients, server shutting down...");
     }
